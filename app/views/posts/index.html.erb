@@ -1,5 +1,5 @@
 <% @posts.each do |post| %>
-    <div class="panel panel-info" style="margin: 0 auto; width: 70%">
+    <div class="panel panel-info post">
       <div class="panel-heading">
         <%= link_to post.owner_id, "http://vk.com/wall#{post.owner_id}_#{post.vk_id}" %>
       </div>
