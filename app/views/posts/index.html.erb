@@ -1,25 +1,20 @@
-<h1>Listing posts</h1>
+<% @posts.each do |post| %>
+    <div class="panel panel-info" style="margin: 0 auto; width: 70%">
+      <div class="panel-heading">
+        <%= link_to post.owner_id, "http://vk.com/wall#{post.owner_id}_#{post.vk_id}" %>
+      </div>
+      <div class="panel-body">
+        <p> <%= post.text.html_safe %></p>
+        <% unless post.attachment_text.nil? %>
+            <br/>
+            <p>  <%= post.text.html_safe %> </p>
+        <% end %>
+        <% unless post.attachment_image.nil? %>
+            <br/>
+            <%= link_to image_tag(post.attachment_image),
+                        "http://vk.com/#{post.attachment_type}#{post.attachment_owner_id}_#{post.attachment_id}" %>
+        <% end %>
 
-<table>
-  <thead>
-    <tr>
-      <th></th>
-      <th></th>
-      <th></th>
-    </tr>
-  </thead>
-
-  <tbody>
-    <% @posts.each do |post| %>
-      <tr>
-        <td><%= link_to 'Show', post %></td>
-        <td><%= link_to 'Edit', edit_post_path(post) %></td>
-        <td><%= link_to 'Destroy', post, method: :delete, data: { confirm: 'Are you sure?' } %></td>
-      </tr>
-    <% end %>
-  </tbody>
-</table>
-
-<br>
-
-<%= link_to 'New Post', new_post_path %>
+      </div>
+    </div>
+<% end %>
