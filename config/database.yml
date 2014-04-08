@@ -19,6 +19,7 @@ development:
   encoding: unicode
   database: crawler_sample
   pool: 5
+  host: localhost
   username: <%=ENV["PG_USER"]%>
   password: <%=ENV["PG_PASS"]%>
 
