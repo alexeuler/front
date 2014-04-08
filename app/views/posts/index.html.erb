@@ -1,7 +1,7 @@
 <% @posts.each do |post| %>
     <div class="panel panel-info post">
       <div class="panel-heading">
-        <%= link_to post.owner_id, "http://vk.com/wall#{post.owner_id}_#{post.vk_id}" %>
+        <%= link_to post.owner_id, post.vk_url %>
       </div>
       <div class="panel-body">
         <table class="post-data">
@@ -34,8 +34,7 @@
         <% end %>
         <% unless post.attachment_image.nil? %>
             <br/>
-            <%= link_to image_tag(post.attachment_image),
-                        "http://vk.com/#{post.attachment_type}#{post.attachment_owner_id}_#{post.attachment_id}" %>
+            <%= link_to image_tag(post.attachment_image), post.attachment_vk_url %>
         <% end %>
 
       </div>
