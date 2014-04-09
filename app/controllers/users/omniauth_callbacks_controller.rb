@@ -1,7 +1,7 @@
 class Users::OmniauthCallbacksController < Devise::OmniauthCallbacksController
   def vkontakte
     info = request.env["omniauth.auth"]
-    user = User.where(email: info["uid"]).first
+    user = User.where(email: info["uid"] + "@vk.com").first
     user = User.create!(email: info["uid"] + "@vk.com",
                        password: Devise.friendly_token[0, 20],
                        first_name: info["info"]["first_name"],
