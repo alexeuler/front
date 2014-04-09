@@ -1,3 +1,4 @@
+require 'ostruct'
 class PostsController < ApplicationController
   #before_action :set_post, only: [:show, :edit, :update, :destroy]
 
@@ -5,7 +6,7 @@ class PostsController < ApplicationController
   # GET /posts.json
   def index
     redirect_to root_path unless user_signed_in?
-    @posts = Post.ai_picked
+    @posts = Post.ai_picked.map {|x| OpenStruct.new(x.attributes)}
   end
 
 =begin

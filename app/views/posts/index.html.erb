@@ -7,7 +7,19 @@
 <% @posts.each do |post| %>
     <div class="panel panel-info post">
       <div class="panel-heading">
-        <%= link_to post.owner_id, post.vk_url %>
+
+        <div class="btn-group" data-toggle="buttons">
+          <label class="btn btn-default <%="active" if post.like == 1%>">
+            <input type="radio" name="options" id="option1"> Нравится
+          </label>
+          <label class="btn btn-default <%="active" if post.like == 0%>">
+            <input type="radio" name="options" id="option2"> Не нравится
+          </label>
+          <label class="btn btn-default <%="active" if post.like.nil?%>">
+            <input type="radio" name="options" id="option3"> Нейтрально
+          </label>
+        </div>
+        &nbsp<%= link_to "Ссылка на пост", post.vk_url %>
       </div>
       <div class="panel-body">
         <table class="post-data">
