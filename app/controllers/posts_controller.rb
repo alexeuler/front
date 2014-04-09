@@ -4,6 +4,7 @@ class PostsController < ApplicationController
   # GET /posts
   # GET /posts.json
   def index
+    redirect_to root_path unless user_signed_in?
     @posts = Post.ai_picked
   end
 
