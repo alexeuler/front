@@ -34,6 +34,11 @@ end
 
 gem 'bootstrap-sass', '~> 3.1.1'
 
+gem 'devise'
+gem 'omniauth'
+gem 'omniauth-facebook'
+gem 'omniauth-vkontakte'
+
 # Use ActiveModel has_secure_password
 # gem 'bcrypt-ruby', '~> 3.0.0'
 
