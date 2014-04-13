@@ -6,12 +6,11 @@ class PostsController < ApplicationController
   # GET /posts.json
   def index
     redirect_to root_path unless user_signed_in?
-    @posts = Post.ai_picked.map do |x| 
+    @posts = Post.ai_picked.map do |x|
       post = OpenStruct.new(x.attributes)
       post.vk_url = x.vk_url
       post.attachment_vk_url = x.attachment_vk_url
-      post_like_item = PostLike.where(post_id: post.id).first
-      post.like = post_like_item.nil? ? 0 : post_like_item.value
+      post.like = x.post_like.nil? ? 0 : x.post_like.value
       post
     end
   end

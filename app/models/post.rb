@@ -1,7 +1,8 @@
 class Post < ActiveRecord::Base
 
+  has_one :post_like
   def self.ai_picked
-    self.order(likes_count: :desc).limit(10)
+    self.includes("post_like").order(likes_count: :desc).limit(10)
   end
   
   def attachment_vk_url
