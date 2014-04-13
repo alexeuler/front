@@ -17,7 +17,7 @@
 development:
   adapter: postgresql
   encoding: unicode
-  database: crawler
+  database: <%=ENV["PG_NAME"]%>
   pool: 5
   host: localhost
   username: <%=ENV["PG_USER"]%>
