@@ -107,6 +107,7 @@ GEM
       rake (>= 0.8.7)
       thor (>= 0.18.1, < 2.0)
     rake (10.2.2)
+    rb-libsvm (1.1.4)
     rdoc (4.1.1)
       json (~> 1.4)
     sass (3.2.19)
@@ -156,6 +157,7 @@ DEPENDENCIES
   omniauth-vkontakte
   pg
   rails (= 4.0.0)
+  rb-libsvm
   sass-rails (~> 4.0.0)
   sdoc
   turbolinks
