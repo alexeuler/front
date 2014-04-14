@@ -3,6 +3,13 @@ require 'svm/featureable'
 
 module SVM
   describe Featureable do
+
+    describe "#to_svm_feature" do
+      it "transforms feature into libsvm format" do
+
+      end
+    end
+
     describe "#to_feature" do
       it "transforms feature_names into vector" do
         class FeatureTest < OpenStruct
@@ -53,12 +60,7 @@ module SVM
         test.y_coord = 0
         test.status = "off"
         expect(test.to_feature).to eq([0.5, 2, 0, 0, 0, 1])
-
       end
-
-
     end
-
   end
-
 end

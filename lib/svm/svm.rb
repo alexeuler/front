@@ -2,22 +2,6 @@ require 'libsvm'
 module SVM
   class SVM
 
-    FEATURES_NAMES = %w(likes_count  likes_age  likes_share
-      closed_profiles_share reposts_count text_length
-      comments_count log_id attachment_type)
-
-    FEATURES_LAMBDAS = {
-        text_length: lambda {|x| x.text.length},
-        log_id: lambda {|x| Math.log (x.vk_id)},
-        attachment_type: lambda do |x|
-          names = %w(graffiti audio link video poll doc photo note album)
-          result = Array.new(names.count + 1, 0)
-          index = names.index(x.attachment_type) || result.length - 1
-          result[index] = 1
-          result
-        end
-    }
-
     def self.load(user)
       Libsvm::Model.load("#{Rails.root}/app/models/#{user.email}")
     end
