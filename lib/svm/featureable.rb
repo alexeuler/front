@@ -30,7 +30,7 @@ module SVM
         value = self.send(name)
         index = states.index(value)
         vector = Array.new(states.count, 0)
-        vector[index] = 1
+        vector[index] = 1 if index
         ary += vector
       end if feature_ordinals
       ary

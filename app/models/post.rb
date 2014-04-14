@@ -11,7 +11,6 @@ class Post < ActiveRecord::Base
       text_length: lambda { |x| x.text.length },
       log_id: lambda { |x| Math.log (x.vk_id) }
   }
-
   self.feature_ordinals = {
       attachment_type: [nil, "graffiti", "audio", "link", "video", "poll", "doc", "photo", "note", "album"]
   }
