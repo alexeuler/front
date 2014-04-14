@@ -49,6 +49,7 @@ test:
   encoding: unicode
   database: front_test
   pool: 5
+  host: localhost
   username: <%=ENV["PG_USER"]%>
   password: <%=ENV["PG_PASS"]%>
 
@@ -56,6 +57,7 @@ production:
   adapter: postgresql
   encoding: unicode
   database: crawler_sample
+  host: localhost
   pool: 5
   username: <%=ENV["PG_USER"]%>
   password: <%=ENV["PG_PASS"]%>
