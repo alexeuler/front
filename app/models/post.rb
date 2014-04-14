@@ -5,11 +5,11 @@ class Post < ActiveRecord::Base
 
   include SVM::Featureable
   self.feature_names = %w(likes_count  likes_age  likes_share
-      closed_profiles_share reposts_count text_length
-      comments_count log_id attachment_type)
+      closed_profiles_share reposts_count text
+      comments_count vk_id attachment_type)
   self.feature_lambdas = {
-      text_length: lambda { |x| x.text.length },
-      log_id: lambda { |x| Math.log (x.vk_id) }
+      text: lambda { |x| x.text.length },
+      vk_id: lambda { |x| Math.log (x.vk_id) }
   }
   self.feature_ordinals = {
       attachment_type: [nil, "graffiti", "audio", "link", "video", "poll", "doc", "photo", "note", "album"]
