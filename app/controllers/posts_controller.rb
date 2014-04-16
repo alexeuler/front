@@ -6,6 +6,7 @@ class PostsController < ApplicationController
   # GET /posts.json
   def index
     redirect_to root_path unless user_signed_in?
+
     @posts = Post.ai_picked.map do |x|
       post = OpenStruct.new(x.attributes)
       post.vk_url = x.vk_url
