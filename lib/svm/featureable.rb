@@ -10,11 +10,6 @@ module SVM
       base.extend(ClassMethods)
     end
 
-    def to_svm_feature
-      vector = to_feature
-      Libsvm::Node.features(vector)
-    end
-
     def to_feature
       feature_ordinals = self.class.feature_ordinals
       feature_names= self.class.feature_names && self.class.feature_names.map(&:to_sym)
