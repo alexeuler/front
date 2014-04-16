@@ -8,8 +8,8 @@ class Post < ActiveRecord::Base
       closed_profiles_share reposts_count text
       comments_count vk_id attachment_type)
   self.feature_lambdas = {
-      text: lambda { |x| x.text.length },
-      vk_id: lambda { |x| Math.log (x.vk_id) }
+      text: lambda { |x| x.length },
+      vk_id: lambda { |x| Math.log x }
   }
   self.feature_ordinals = {
       attachment_type: [nil, "graffiti", "audio", "link", "video", "poll", "doc", "photo", "note", "album"]

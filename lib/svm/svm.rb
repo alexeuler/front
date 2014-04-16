@@ -6,31 +6,22 @@ module SVM
       Libsvm::Model.load("#{Rails.root}/app/models/#{user.email}")
     end
 
-    def self.to_array(posts)
-      result = []
-      posts.each do |post|
-        vector = []
-        FEATURES_NAMES.each do |feature_name|
-          lambda = FEATURES_LAMBDAS[feature_name.to_sym]
-          value = lambda.nil? ? post[feature_name] : lambda.call(post)
-          value.is_a?(Array) ? vector += value : vector << value
-        end
-        result << vector
-      end
-      result
-    end
-
-    def self.scale(data)
-      column_count=data[0].count
-      column_count.times do |i|
-        column = data.map {|r| r[i]}
-        min = column.min
-        max = column.max
-        data.each do |d|
-          d[i] = max == min ? 0 : (d[i] - min) / (max - min)
+    def self.scale(models_or_features)
+      features = extract_features(models_or_features)
+      size = features[0].length
+      min_vector = features[0].clone
+      max_vector = features[0].clone
+      features.each do |feature|
+        (0..size-1).each do |i|
+          max_vector[i] = feature[i] if feature[i] > max_vector[i]
+          min_vector[i] = feature[i] if feature[i] < min_vector[i]
         end
       end
-      data
+      features.each do |feature|
+        (0..size-1).each do |i|
+          feature[i] = (feature[i] - min_vector[i]).to_f / (max_vector[i] - min_vector[i]) unless max_vector[i] == min_vector[i]
+        end
+      end
     end
 
     def self.train(posts)
@@ -41,6 +32,17 @@ module SVM
       parameter.c = 10
       problem.set_examples(labels, examples)
       @model = Libsvm::Model.train(problem, parameter)
+    end
+
+    private
+
+    def self.extract_features(models_or_features)
+      models_or_features = models_or_features.is_a?(Array) ? models_or_features : [models_or_features]
+      features = models_or_features[0].is_a?(Array) ? models_or_features :
+          models_or_features.map(&:to_feature)
+      size = features[0].length
+      features.each {|f| raise "Features of different length in array." unless f.length == size}
+      features
     end
   end
 end
