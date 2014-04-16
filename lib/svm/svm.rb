@@ -1,6 +1,6 @@
 require 'libsvm'
 module SVM
-  class SVM
+  class Svm
 
     PATH = "#{Rails.root}/app/svm_models/"
 
@@ -19,9 +19,11 @@ module SVM
     end
 
     def train(labels, models_or_features)
+      return if labels.nil? or models_or_features.nil? or labels.count == 0 or models_or_features.count == 0
       features = extract_features(models_or_features)
       find_extremes(features)
       features.map! {|f| scale(f)}
+      features.map! {|f| Libsvm::Node.features(f)}
       problem = Libsvm::Problem.new
       parameter = Libsvm::SvmParameter.new
       parameter.cache_size = 1 # in megabytes
@@ -32,8 +34,9 @@ module SVM
     end
 
     def predict_probability(model_or_features)
-      features = extract_features(models_or_features)
-      result = features.map {|f| @model.predict_probability(f)}
+      return 0 if model_or_features.nil? or @model.nil?
+      features = extract_features(model_or_features)
+      result = features.map {|f| @model.predict_probability(Libsvm::Node.features(f))}
       result.length == 1 ? result[0] : result
     end
 
@@ -53,6 +56,7 @@ module SVM
 
     def scale(feature)
       result = []
+      size = feature.length
       (0..size-1).each do |i|
         # note that if the vector outside training set contains new feature value
         # (and training set contained only one other value) it'll be ignored
