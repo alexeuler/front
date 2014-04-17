@@ -13,7 +13,7 @@ module SVM
         sample = get_untrained_sample
         items = pick_random_items(sample, POSTS_PER_PAGE)
         ids = items.map(&:id)
-        nullify_likes(ids)
+        nullify_likes(user.id, ids)
         return Post.includes(:post_like).where(id: ids).to_a
       end
 
@@ -35,7 +35,7 @@ module SVM
       result += self.pick_random_items(predicted, result_count)
 
       ids = result.map { |x| x[1] }
-      nullify_likes(ids)
+      nullify_likes(user.id, ids)
       Post.includes(:post_like).where(id: ids).to_a
     end
 
@@ -71,9 +71,9 @@ module SVM
       result
     end
 
-    def self.nullify_likes(ids)
-      ids.each do |id|
-        like = PostLike.where(user_id: user.id, post_id: id).first_or_initialize
+    def self.nullify_likes(user_id, post_ids)
+      post_ids.each do |id|
+        like = PostLike.where(user_id: user_id, post_id: id).first_or_initialize
         like.value = 0
         like.save
       end
