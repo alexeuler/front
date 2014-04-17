@@ -21,18 +21,23 @@ module SVM
       svm.train(labels, posts)
 
       untrained_sample = get_untrained_sample(posts)
-      probabilities = untrained_sample.map { |p| [svm.predict_probability(p), p.id] }
+      probabilities = untrained_sample.map do |p|
+        value, prob = svm.predict_probability(p)
+        value == 0 ? nil : [prob, p.id]
+      end
+      #ToDo - modify so that random is not affected
+      probabilities.compact!
       probabilities.sort!
       suggested_posts_number = ([posts.count.to_f / MAX_TRAINING, 1].min * POSTS_PER_PAGE).round(0)
       result_count = POSTS_PER_PAGE
       result = []
       suggested_posts_number.times do
         break if probabilities.count == 0
-        result << predicted.pop
+        result << probabilities.pop
         result_count -= 1
       end
 
-      result += self.pick_random_items(predicted, result_count)
+      result += self.pick_random_items(probabilities, result_count)
 
       ids = result.map { |x| x[1] }
       nullify_likes(user.id, ids)

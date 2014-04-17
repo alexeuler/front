@@ -45,7 +45,7 @@ module SVM
       feature = scale(feature)
       feature = Libsvm::Node.features(feature)
       result = @model.predict_probability(feature)
-      result[1].max
+      [result[0],result[1].max]
     end
 
     private
