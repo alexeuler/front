@@ -42,6 +42,7 @@ module SVM
       raise SVMError, "Nil feature is not allowed" if model_or_feature.nil?
       raise SVMError, "Model is not defined" if @model.nil?
       feature = extract_features([model_or_feature])[0]
+      feature = scale(feature)
       feature = Libsvm::Node.features(feature)
       result = @model.predict_probability(feature)
       result[1].max
