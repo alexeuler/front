@@ -7,10 +7,11 @@ module SVM
     POSTS_PER_PAGE = 10
 
     def self.select(user)
-      posts = Post.includes(:post_like).where('"post_likes".user_id = ?', user.id).to_a
+      labels, posts = self.get_training_sample(user)
+      #ToDo - add logic if training set is empty
       svm = Svm.new user: user
-      labels = posts.map {|p| p.post_like.value}
       svm.train(labels, posts)
+      svm.save
       trained_ids = posts.map(&:id)
       untrained = trained_ids.empty? ? Post.all.to_a : Post.where("id not in (?)", trained_ids).to_a
       predicted = untrained.map {|p| [svm.predict_probability(p), p.id]}
@@ -30,5 +31,18 @@ module SVM
       ids = result.map {|x| x[1]}
       Post.includes(:post_like).where(id: ids).to_a
     end
+
+    private
+
+    def self.get_training_sample(user)
+      posts = Post.includes(:post_like).where(post_likes: {user_id: user.id}).to_a
+      #Post.includes(:post_like).where('"post_likes".user_id = ?', user.id).to_a
+      labels = posts.map {|p| p.post_like.value}
+      [labels, posts]
+    end
+
+
   end
+
+
 end
