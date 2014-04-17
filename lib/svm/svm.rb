@@ -3,6 +3,8 @@ module SVM
   class Svm
 
     PATH = "#{Rails.root}/app/svm_models/"
+    class SVMError < RuntimeError
+    end
 
     def self.load(user)
       model = Libsvm::Model.load("#{Path}#{user.email}")
@@ -19,7 +21,8 @@ module SVM
     end
 
     def train(labels, models_or_features)
-      return if labels.nil? or models_or_features.nil? or labels.count == 0 or models_or_features.count == 0
+      raise SVMError, "Empty train set is not allowed" if models_or_features.nil? || models_or_features.empty?
+      raise SVMError, "Labels and features size mismatch" unless labels.count == models_or_features.count
       features = extract_features(models_or_features)
       find_extremes(features)
       features.map! {|f| scale(f)}
@@ -33,11 +36,13 @@ module SVM
       @model = Libsvm::Model.train(problem, parameter)
     end
 
-    def predict_probability(model_or_features)
-      return 0 if model_or_features.nil? or @model.nil?
-      features = extract_features(model_or_features)
-      result = features.map {|f| @model.predict_probability(Libsvm::Node.features(f))}
-      result.length == 1 ? result[0] : result
+    def predict_probability(model_or_feature)
+      raise SVMError, "Nil feature is not allowed" if model_or_feature.nil?
+      raise SVMError, "Model is not defined" if @model.nil?
+      feature = extract_features(model_or_feature)[0]
+      feature = Libsvm::Node.features(feature)
+      result = @model.predict_probability(feature)
+      result[1][1]
     end
 
     private
