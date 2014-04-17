@@ -13,6 +13,7 @@ module SVM
         sample = get_untrained_sample
         items = pick_random_items(sample, POSTS_PER_PAGE)
         ids = items.map(&:id)
+        nullify_likes(ids)
         return Post.includes(:post_like).where(id: ids).to_a
       end
 
@@ -25,7 +26,7 @@ module SVM
       suggested_posts_number = ([posts.count.to_f / MAX_TRAINING, 1].min * POSTS_PER_PAGE).round(0)
       result_count = POSTS_PER_PAGE
       result = []
-      svm_posts_number.times do
+      suggested_posts_number.times do
         break if probabilities.count == 0
         result << predicted.pop
         result_count -= 1
@@ -34,12 +35,7 @@ module SVM
       result += self.pick_random_items(predicted, result_count)
 
       ids = result.map { |x| x[1] }
-      ids.each do |id|
-        like = PostLike.where(user_id: user.id, post_id: id).first_or_initialize
-        like.value = 0
-        like.save
-      end
-
+      nullify_likes(ids)
       Post.includes(:post_like).where(id: ids).to_a
     end
 
@@ -73,6 +69,14 @@ module SVM
         result << item
       end
       result
+    end
+
+    def self.nullify_likes(ids)
+      ids.each do |id|
+        like = PostLike.where(user_id: user.id, post_id: id).first_or_initialize
+        like.value = 0
+        like.save
+      end
     end
 
   end
