@@ -21,7 +21,7 @@ module SVM
         sample.delete_if { |x| svm.predict_probability(x) == 0 && rand <=training_progress } if trained
       end while sample.count < POSTS_PER_PAGE && tries <= MAX_SAMPLING_TRIES
 
-      extracted=extract_posts_from_sample(sample)
+      extracted=select_posts_from_sample(sample)
       ids = extracted.map(&:id)
       nullify_likes(user.id, ids)
       Post.includes(:post_like).where(id: ids).to_a
@@ -50,8 +50,8 @@ module SVM
       klass.order("random()").limit(count).to_a
     end
 
-    def self.extract_posts_from_sample(sample)
-      sorted = sample.sort_by(&:likes_count)
+    def self.select_posts_from_sample(sample)
+      sorted = sample.sort {|a,b| b.likes_count <=> b.likes_count}
       step = sorted.length.to_f / POSTS_PER_PAGE
       result = []
       (0..POSTS_PER_PAGE-1).each do |i|
