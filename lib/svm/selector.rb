@@ -5,41 +5,24 @@ module SVM
 
     MAX_TRAINING = 100
     POSTS_PER_PAGE = 10
+    MAX_SAMPLING_TRIES = 3
 
     def self.select(user)
       labels, posts = self.get_training_sample(user)
-
-      if labels.count == 0
-        sample = get_untrained_sample
-        items = pick_random_items(sample, POSTS_PER_PAGE)
-        ids = items.map(&:id)
-        nullify_likes(user.id, ids)
-        return Post.includes(:post_like).where(id: ids).to_a
-      end
-
       svm = Svm.new user: user
-      svm.train(labels, posts)
+      trained = (labels.count != 0)
+      svm.train(labels, posts) if trained
+      training_progress = [labels.count.to_f / MAX_TRAINING, 1].min
 
-      untrained_sample = get_untrained_sample(posts)
-      probabilities = untrained_sample.map do |p|
-        value, prob = svm.predict_probability(p)
-        value == 0 ? nil : [prob, p.id]
-      end
-      #ToDo - modify so that random is not affected
-      probabilities.compact!
-      probabilities.sort!
-      suggested_posts_number = ([posts.count.to_f / MAX_TRAINING, 1].min * POSTS_PER_PAGE).round(0)
-      result_count = POSTS_PER_PAGE
-      result = []
-      suggested_posts_number.times do
-        break if probabilities.count == 0
-        result << probabilities.pop
-        result_count -= 1
-      end
+      sample, tries = [], 0
+      begin
+        tries +=1
+        sample+= pick_posts_sample(excluding: posts.map(&:id))
+        sample.delete_if { |x| svm.predict_probability(x) == 0 && rand <=training_progress } if trained
+      end while sample.count < POSTS_PER_PAGE && tries <= MAX_SAMPLING_TRIES
 
-      result += self.pick_random_items(probabilities, result_count)
-
-      ids = result.map { |x| x[1] }
+      extracted=extract_posts_from_sample(sample)
+      ids = extracted.map(&:id)
       nullify_likes(user.id, ids)
       Post.includes(:post_like).where(id: ids).to_a
     end
@@ -52,36 +35,29 @@ module SVM
       [labels, posts]
     end
 
-    def self.get_untrained_sample(trained_sample = [])
-      return Post.all.to_a if trained_sample.nil? or trained_sample.empty?
-      trained_ids = trained_sample.map(&:id)
-      Post.where("id not in (?)", trained_ids).to_a
-    end
-
-    def self.get_untrained_sample_ids(trained_sample = [])
-      return Post.select(:id).all.to_a if trained_sample.nil? or trained_sample.empty?
-      trained_ids = trained_sample.map(&:id)
-      Post.where("id not in (?)", trained_ids).to_a
-    end
-
-
-    def self.pick_random_items(array, n)
-      array.shuffle!
-      result = []
-      n.times do
-        break if array.count == 0
-        item = array.pop
-        result << item
-      end
-      result
-    end
-
     def self.nullify_likes(user_id, post_ids)
       post_ids.each do |id|
         like = PostLike.where(user_id: user_id, post_id: id).first_or_initialize
         like.value = 0
         like.save
       end
+    end
+
+    def self.pick_posts_sample(args = {})
+      excluding = args[:excluding] || []
+      count = args[:count] || 1000
+      klass = excluding.empty? ? Post : Post.where("id not in (?)", excluding)
+      klass.order("random()").limit(count).to_a
+    end
+
+    def self.extract_posts_from_sample(sample)
+      sorted = sample.sort_by(&:likes_count)
+      step = sorted.length.to_f / POSTS_PER_PAGE
+      result = []
+      (0..POSTS_PER_PAGE-1).each do |i|
+        result << sorted[(i * step).floor]
+      end
+      result
     end
 
   end
