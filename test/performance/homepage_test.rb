@@ -1,5 +1,4 @@
-require 'test_helper'
-require 'rails/performance_test_help'
+require_relative 'performance_helper'
 include Warden::Test::Helpers
 Warden.test_mode!
 
