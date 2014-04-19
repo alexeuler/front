@@ -47,7 +47,7 @@ development:
 test:
   adapter: postgresql
   encoding: unicode
-  database: front_test
+  database: crawler_sample
   pool: 5
   host: localhost
   username: <%=ENV["PG_USER"]%>

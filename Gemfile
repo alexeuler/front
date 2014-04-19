@@ -45,6 +45,11 @@ group :development, :test do
   gem 'rspec-rails', '~> 3.0.0.beta'
 end
 
+gem "test-unit", group: :test
+gem 'rails-perftest', group: :test
+gem 'ruby-prof', group: :test
+
+
 # Use ActiveModel has_secure_password
 # gem 'bcrypt-ruby', '~> 3.0.0'
 
