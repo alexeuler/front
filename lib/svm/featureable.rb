@@ -3,7 +3,19 @@ module SVM
   module Featureable
 
     module ClassMethods
-      attr_accessor :feature_names, :feature_lambdas, :feature_ordinals
+      attr_accessor :feature_lambdas
+      attr_reader :feature_names, :feature_ordinals
+
+      def feature_names=(names)
+        @feature_names = names.map(&:to_sym)
+        @feature_names = feature_ordinals.nil? ? @feature_names : @feature_names - feature_ordinals.keys.map(&:to_sym)
+      end
+
+      def feature_ordinals=(ordinals)
+        @feature_ordinals = ordinals
+        @feature_names = feature_ordinals.nil? ? @feature_names : @feature_names - feature_ordinals.keys.map(&:to_sym)
+      end
+
     end
 
     def self.included(base)
@@ -12,11 +24,11 @@ module SVM
 
     def to_feature
       feature_ordinals = self.class.feature_ordinals
-      feature_names= self.class.feature_names && self.class.feature_names.map(&:to_sym)
       feature_lambdas = self.class.feature_lambdas
-      names = feature_ordinals.nil? ? feature_names : feature_names - feature_ordinals.keys.map(&:to_sym)
+      feature_names = self.class.feature_names
       ary = []
-      names.each do |name|
+      #ToDo - assign whole attributes to ary, except lambdas and ordinals
+      feature_names.each do |name|
         value = self.send(name)
         value = feature_lambdas[name].call(value) if feature_lambdas and feature_lambdas.keys.include?(name)
         ary << value
