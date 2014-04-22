@@ -15,16 +15,17 @@ module SVM
       training_progress = [labels.count.to_f / MAX_TRAINING, 1].min
 
       sample, tries = [], 0
+      post_ids = posts.map(&:id)
       begin
         tries +=1
-        sample+= pick_posts_sample(excluding: posts.map(&:id))
+        sample+= pick_posts_sample(excluding: post_ids)
         sample.delete_if { |x| svm.predict_probability(x) == 0 && rand <=training_progress } if trained
       end while sample.count < POSTS_PER_PAGE && tries <= MAX_SAMPLING_TRIES
 
       extracted=select_posts_from_sample(sample)
       ids = extracted.map(&:id)
       nullify_likes(user.id, ids)
-      Post.includes(:post_like).where(id: ids).to_a
+      Post.includes(:post_like).where(id: ids).order(likes_count: :desc).to_a
     end
 
     private
@@ -51,7 +52,7 @@ module SVM
     end
 
     def self.select_posts_from_sample(sample)
-      sorted = sample.sort {|a,b| b.likes_count <=> b.likes_count}
+      sorted = sample.sort {|a,b| b.likes_count <=> a.likes_count}
       step = sorted.length.to_f / POSTS_PER_PAGE
       result = []
       (0..POSTS_PER_PAGE-1).each do |i|
