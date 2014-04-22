@@ -18,12 +18,18 @@ module SVM
       post_ids = posts.map(&:id)
       begin
         tries +=1
-        sample+= pick_posts_sample(excluding: post_ids)
-        sample.delete_if { |x| svm.predict_probability(x) == 0 && rand <=training_progress } if trained
+        picked = pick_sample(excluding: post_ids)
+        picked.map! do |post|
+          forecast = svm.predict_probability(post)
+          forecast[:label] == 0 ? nil : {post: post, prob: forecast[:prob]}
+        end
+        #ToDo picked is empty, add random sample
+        picked.compact!
+        sample+= picked
       end while sample.count < POSTS_PER_PAGE && tries <= MAX_SAMPLING_TRIES
-
-      extracted=select_posts_from_sample(sample)
-      ids = extracted.map(&:id)
+      sample.sort {|a,b| b[:prob] <=> a[:prob]}
+      extracted=sample.first(POSTS_PER_PAGE)
+      ids = extracted.map {|tuple| post[:post].id}
       nullify_likes(user.id, ids)
       Post.includes(:post_like).where(id: ids).order(likes_count: :desc).to_a
     end
@@ -44,7 +50,7 @@ module SVM
       end
     end
 
-    def self.pick_posts_sample(args = {})
+    def self.pick_sample(args = {})
       excluding = args[:excluding] || []
       count = args[:count] || 1000
       klass = excluding.empty? ? Post : Post.where("id not in (?)", excluding)
