@@ -27,6 +27,7 @@ module SVM
       find_extremes(features)
       features.map! {|f| scale(f)}
       features.map! {|f| Libsvm::Node.features(f)}
+
       problem = Libsvm::Problem.new
       parameter = Libsvm::SvmParameter.new
       parameter.cache_size = 1 # in megabytes
