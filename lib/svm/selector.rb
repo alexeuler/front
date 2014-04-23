@@ -5,7 +5,7 @@ module SVM
 
     MAX_TRAINING = 100
     POSTS_PER_PAGE = 10
-    MAX_SAMPLING_TRIES = 3
+    MAX_SAMPLING_TRIES = 1
 
     def self.select(user)
       labels, posts = self.get_training_sample(user)
@@ -14,22 +14,28 @@ module SVM
       svm.train(labels, posts) if trained
       training_progress = [labels.count.to_f / MAX_TRAINING, 1].min
 
-      sample, tries = [], 0
+      selection, tries = [], 0
       post_ids = posts.map(&:id)
-      begin
-        tries +=1
-        picked = pick_sample(excluding: post_ids)
-        picked.map! do |post|
-          forecast = svm.predict_probability(post)
-          forecast[:label] == 0 ? nil : {post: post, prob: forecast[:prob]}
-        end
-        #ToDo picked is empty, add random sample
-        picked.compact!
-        sample+= picked
-      end while sample.count < POSTS_PER_PAGE && tries <= MAX_SAMPLING_TRIES
-      sample.sort {|a,b| b[:prob] <=> a[:prob]}
-      extracted=sample.first(POSTS_PER_PAGE)
-      ids = extracted.map {|tuple| post[:post].id}
+      picked = []
+      if trained
+        begin
+          tries +=1
+          picked = pick_sample(excluding: post_ids)
+          filtered = picked.map do |post|
+            forecast = svm.predict_probability(post)
+            forecast[:label] == 0 ? nil : {post: post, prob: forecast[:prob]}
+          end
+          #ToDo picked is empty, add random sample
+          filtered.compact!
+          selection+= filtered
+        end while selection.count < POSTS_PER_PAGE && tries <= MAX_SAMPLING_TRIES
+      end
+      selection.sort { |a, b| b[:prob] <=> a[:prob] }
+      extracted= selection.first(POSTS_PER_PAGE * training_progress)
+      picked = pick_sample(excluding: post_ids) if picked.empty?
+      sample = picked.sample(POSTS_PER_PAGE - extracted.count).map { |x| {post: x, prob: 0} }
+      extracted += sample
+      ids = extracted.map { |tuple| tuple[:post].id }
       nullify_likes(user.id, ids)
       Post.includes(:post_like).where(id: ids).order(likes_count: :desc).to_a
     end
@@ -58,7 +64,7 @@ module SVM
     end
 
     def self.select_posts_from_sample(sample)
-      sorted = sample.sort {|a,b| b.likes_count <=> a.likes_count}
+      sorted = sample.sort { |a, b| b.likes_count <=> a.likes_count }
       step = sorted.length.to_f / POSTS_PER_PAGE
       result = []
       (0..POSTS_PER_PAGE-1).each do |i|

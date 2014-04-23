@@ -30,10 +30,10 @@ module SVM
       problem = Libsvm::Problem.new
       parameter = Libsvm::SvmParameter.new
       parameter.cache_size = 1 # in megabytes
-      parameter.eps = 0.001
+      parameter.eps = 0.1
       parameter.c = 10
       parameter.probability = 1
-      # parameter.kernel_type = Libsvm::KernelType::RBF
+      parameter.kernel_type = Libsvm::KernelType::RBF
       problem.set_examples(labels, features)
       @model = Libsvm::Model.train(problem, parameter)
     end
