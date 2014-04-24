@@ -31,7 +31,8 @@ module SVM
       problem = Libsvm::Problem.new
       parameter = Libsvm::SvmParameter.new
       parameter.cache_size = 1 # in megabytes
-      parameter.eps = 0.1
+      parameter.gamma = 1
+      parameter.eps = 0.01
       parameter.c = 10
       parameter.probability = 1
       parameter.kernel_type = Libsvm::KernelType::RBF
