@@ -66,7 +66,7 @@ test:
 production:
   adapter: postgresql
   encoding: unicode
-  database: crawler_sample
+  database: crawler
   host: localhost
   pool: 5
   username: <%=ENV["PG_USER"]%>
