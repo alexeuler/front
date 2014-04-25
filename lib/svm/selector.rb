@@ -5,7 +5,7 @@ module SVM
 
     MAX_TRAINING = 100
     POSTS_PER_PAGE = 10
-    MAX_SAMPLING_TRIES = 1
+    SAMPLE_SIZE = 1000
 
     def self.select(user)
       labels, posts = self.get_training_sample(user)
@@ -16,11 +16,13 @@ module SVM
 
       selection, tries = [], 0
       post_ids = posts.map(&:id)
+      max = Post.count
       picked = []
       if trained
         begin
+          sample_size = sample_size ? sample_size * 2 : SAMPLE_SIZE
           tries +=1
-          picked = pick_sample(excluding: post_ids)
+          picked = pick_sample(excluding: post_ids, count: sample_size)
           filtered = picked.map do |post|
             forecast = svm.predict_probability(post)
             forecast[:label] == 0 ? nil : {post: post, prob: forecast[:prob]}
@@ -28,7 +30,7 @@ module SVM
           #ToDo picked is empty, add random sample
           filtered.compact!
           selection+= filtered
-        end while selection.count < POSTS_PER_PAGE && tries <= MAX_SAMPLING_TRIES
+        end while selection.count < POSTS_PER_PAGE && sample_size <= max
       end
       selection.sort { |a, b| b[:prob] <=> a[:prob] }
       extracted= selection.first(POSTS_PER_PAGE * training_progress)
@@ -58,7 +60,7 @@ module SVM
 
     def self.pick_sample(args = {})
       excluding = args[:excluding] || []
-      count = args[:count] || 1000
+      count = args[:count] || SAMPLE_SIZE
       klass = excluding.empty? ? Post : Post.where("id not in (?)", excluding)
       klass.order("random()").limit(count).to_a
     end
