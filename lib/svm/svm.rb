@@ -3,6 +3,10 @@ module SVM
   class Svm
 
     PATH = "#{Rails.root}/app/svm_models/"
+    DEFAULT_C = 2
+    DEFAULT_GAMMA = 64
+
+
     class SVMError < RuntimeError
     end
 
@@ -25,19 +29,11 @@ module SVM
       raise SVMError, "Labels and features size mismatch" unless labels.count == models_or_features.count
       features = extract_features(models_or_features)
       find_extremes(features)
-      features.map! {|f| scale(f)}
-      features.map! {|f| Libsvm::Node.features(f)}
-
-      problem = Libsvm::Problem.new
-      parameter = Libsvm::SvmParameter.new
-      parameter.cache_size = 1 # in megabytes
-      parameter.gamma = 1
-      parameter.eps = 0.01
-      parameter.c = 10
-      parameter.probability = 1
-      parameter.kernel_type = Libsvm::KernelType::RBF
+      features.map! { |f| scale(f) }
+      features.map! { |f| Libsvm::Node.features(f) }
       problem.set_examples(labels, features)
-      @model = Libsvm::Model.train(problem, parameter)
+      param = get_param(labels: labels, features: features)
+      @model = Libsvm::Model.train(problem, param)
     end
 
     def predict_probability(model_or_feature)
@@ -51,6 +47,77 @@ module SVM
     end
 
     private
+
+    def get_param(args = {})
+      labels = args[:labels]
+      features = args[:features]
+      best = labels.nil? ? {params: [DEFAULT_C, DEFAULT_GAMMA]} : find_optimal_parameters(labels, features)
+      rbf_parameter(best[:params][0], best[:params][1])
+    end
+
+    def find_optimal_parameters(label, features)
+      best = {params: [], accuracy: 0}
+      cs.each do |c|
+        gammas.each do |gamma|
+          accuracy = cross_validate labels: labels, features: features,
+                                    chunk_size: [labels.count / 10, 1].max, c: c, gamma: gamma
+          if accuracy > best[:accuracy]
+            best[:accuracy] = accuracy
+            best[:params] = [c, gamma]
+          end
+        end
+      end
+      best
+    end
+
+
+    def gammas
+      result = []
+      7.times do |i|
+        result << 2 ** (i)
+      end
+      result
+    end
+
+    def cs
+      gammas
+    end
+
+    def rbf_parameter(c, gamma)
+      parameter = Libsvm::SvmParameter.new
+      parameter.cache_size = 1 # in megabytes
+      parameter.gamma = gamma
+      parameter.eps = 0.01
+      parameter.c = c
+      parameter.probability = 1
+      parameter.kernel_type = Libsvm::KernelType::RBF
+      parameter
+    end
+
+    def cross_validate(args = {})
+      labels = args[:labels]
+      features = args[:features]
+      chunk_size = args[:chunk_size]
+      c = args[:c]
+      gamma = args[:gamma]
+      steps = (labels.count - 1) / chunk_size + 1
+      errors = 0
+      steps.times do |i|
+        training_features = features.clone
+        training_labels = labels.clone
+        test_features = training_features.slice!(i * chunk_size, chunk_size)
+        test_labels = training_labels.slice!(i * chunk_size, chunk_size)
+        problem = Libsvm::Problem.new
+        problem.set_examples(training_labels, training_features)
+        param = rbf_parameter(c, gamma)
+        model = Libsvm::Model.train(problem, param)
+        test_labels.count.times do |i|
+          errors +=1 unless test_labels[i] == model.predict(test_features[i])
+        end
+      end
+      1 - errors.to_f / labels.count
+    end
+
 
     def find_extremes(features)
       size = features[0].length
