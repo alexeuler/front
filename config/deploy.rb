@@ -33,6 +33,10 @@ after "deploy", "deploy:migrate"
 # before 'deploy:assets:precompile', 'deploy:symlink_db'
 # after 'deploy:migrate', 'deploy:generate_sitemap'
 
+set :default_environment, {
+    PG_USER: ENV["PG_USER"],
+    PG_PASS: ENV["PG_PASS"]
+}
 
 namespace :deploy do
 
