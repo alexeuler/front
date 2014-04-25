@@ -3,9 +3,9 @@ module SVM
   class Svm
 
     PATH = "#{Rails.root}/app/svm_models/"
-    DEFAULT_C = 2
-    DEFAULT_GAMMA = 64
-
+    DEFAULT_C = 11
+    DEFAULT_GAMMA = 62
+    LOG_ACCURACY = true
 
     class SVMError < RuntimeError
     end
@@ -31,8 +31,14 @@ module SVM
       find_extremes(features)
       features.map! { |f| scale(f) }
       features.map! { |f| Libsvm::Node.features(f) }
+      problem = Libsvm::Problem.new
       problem.set_examples(labels, features)
-      param = get_param(labels: labels, features: features)
+      param = get_param
+      if LOG_ACCURACY
+        accuracy = cross_validate labels: labels, features: features,
+                                  chunk_size: [labels.count / 10, 1].max, c: param.c, gamma: param.gamma
+        puts "\n#######Accuracy: #{accuracy} #######\n"
+      end
       @model = Libsvm::Model.train(problem, param)
     end
 
@@ -55,7 +61,7 @@ module SVM
       rbf_parameter(best[:params][0], best[:params][1])
     end
 
-    def find_optimal_parameters(label, features)
+    def find_optimal_parameters(labels, features)
       best = {params: [], accuracy: 0}
       cs.each do |c|
         gammas.each do |gamma|
@@ -74,7 +80,7 @@ module SVM
     def gammas
       result = []
       7.times do |i|
-        result << 2 ** (i)
+        result << 2 ** (i - 3)
       end
       result
     end
