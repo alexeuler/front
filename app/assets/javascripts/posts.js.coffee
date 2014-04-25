@@ -3,8 +3,9 @@ $ ->
     value = if $(this).hasClass("active") then 0 else 1
     $.ajax({
       type: "post",
-      url: "post_like/update",
+      url: "post_likes/update",
       data:
+        _method: "PUT"
         post_id: $(this).data("post-id"),
         value: value
     }).error ->

@@ -1,4 +1,4 @@
-class PostLikeController < ApplicationController
+class PostLikesController < ApplicationController
   def update
     user_id = current_user.id
     post_id = params[:post_id].to_i
@@ -10,5 +10,6 @@ class PostLikeController < ApplicationController
 
   def destroy
     PostLike.destroy_all(user_id: current_user.id)
+    render json: {status:"Ok"}
   end
 end
