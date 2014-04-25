@@ -10,7 +10,7 @@ module SVM
     def self.select(user)
       labels, posts = self.get_training_sample(user)
       svm = Svm.new user: user
-      trained = (labels.count != 0)
+      trained = ((labels.count != 0) and (labels.count(0) != labels.count))
       svm.train(labels, posts) if trained
       training_progress = [labels.count.to_f / MAX_TRAINING, 1].min
 
