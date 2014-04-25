@@ -14,20 +14,18 @@ module SVM
       svm.train(labels, posts) if trained
       training_progress = [labels.count.to_f / MAX_TRAINING, 1].min
 
-      selection, tries = [], 0
+      selection = [], 0
       post_ids = posts.map(&:id)
       max = Post.count
       picked = []
       if trained
         begin
           sample_size = sample_size ? sample_size * 2 : SAMPLE_SIZE
-          tries +=1
           picked = pick_sample(excluding: post_ids, count: sample_size)
           filtered = picked.map do |post|
             forecast = svm.predict_probability(post)
             forecast[:label] == 0 ? nil : {post: post, prob: forecast[:prob]}
           end
-          #ToDo picked is empty, add random sample
           filtered.compact!
           selection+= filtered
         end while selection.count < POSTS_PER_PAGE && sample_size <= max
