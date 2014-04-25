@@ -7,4 +7,8 @@ class PostLikeController < ApplicationController
     @post_like.save
     render json: {status:"Ok"}
   end
+
+  def destroy
+    PostLike.destroy_all(user_id: current_user.id)
+  end
 end

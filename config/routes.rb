@@ -1,5 +1,5 @@
 Front::Application.routes.draw do
-  post "post_like/update"
+  resources :post_likes, :only => [:update, :destroy]
   #get "omniauth_callbacks/vkontakte"
   devise_for :users, :controllers => { :omniauth_callbacks => "users/omniauth_callbacks" }
   resources :users, :only => [:index, :destroy]

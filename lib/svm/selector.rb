@@ -14,7 +14,7 @@ module SVM
       svm.train(labels, posts) if trained
       training_progress = [labels.count.to_f / MAX_TRAINING, 1].min
 
-      selection = [], 0
+      selection = []
       post_ids = posts.map(&:id)
       max = Post.count
       picked = []
