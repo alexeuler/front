@@ -5,7 +5,7 @@ module SVM
     PATH = "#{Rails.root}/app/svm_models/"
     DEFAULT_C = 11
     DEFAULT_GAMMA = 62
-    LOG_ACCURACY = true
+    LOG_ACCURACY = false
 
     class SVMError < RuntimeError
     end
@@ -143,12 +143,6 @@ module SVM
       (0..size-1).each do |i|
         # note that if the vector outside training set contains new feature value
         # (and training set contained only one other value) it'll be ignored
-        if feature[i].nil? || @max_vector[i].nil? || @min_vector[i].nil?
-          puts "feature: #{feature}"
-          puts "max: #{@max_vector}"
-          puts "min: #{@min_vector}"
-        end
-        puts "YO"
         value = @max_vector[i] == @min_vector[i] ? @max_vector[i] : (feature[i] - @min_vector[i]).to_f / (@max_vector[i] - @min_vector[i])
         result << value
       end
