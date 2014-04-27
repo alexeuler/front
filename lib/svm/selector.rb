@@ -6,6 +6,7 @@ module SVM
     MAX_TRAINING = 100
     POSTS_PER_PAGE = 10
     SAMPLE_SIZE = 1000
+    MAX_SAMPLE_SIZE = 4000
 
     def self.select(user)
       labels, posts = self.get_training_sample(user)
@@ -16,7 +17,7 @@ module SVM
 
       selection = []
       post_ids = posts.map(&:id)
-      max = Post.count
+      max = [Post.count, MAX_SAMPLE_SIZE].min
       picked = []
       if trained
         begin
@@ -28,7 +29,7 @@ module SVM
           end
           filtered.compact!
           selection+= filtered
-        end while selection.count < POSTS_PER_PAGE && sample_size <= max
+        end while selection.count < POSTS_PER_PAGE && sample_size < max
       end
       selection.sort { |a, b| b[:prob] <=> a[:prob] }
       extracted= selection.first(POSTS_PER_PAGE * training_progress)
