@@ -148,6 +148,7 @@ module SVM
           puts "max: #{@max_vector}"
           puts "min: #{@min_vector}"
         end
+        puts "YO"
         value = @max_vector[i] == @min_vector[i] ? @max_vector[i] : (feature[i] - @min_vector[i]).to_f / (@max_vector[i] - @min_vector[i])
         result << value
       end
