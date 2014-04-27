@@ -31,7 +31,7 @@ module SVM
       feature_names.each do |name|
         value = self.send(name)
         value = feature_lambdas[name].call(value) if feature_lambdas and feature_lambdas.keys.include?(name)
-        ary << value
+        ary << value || 0
       end
       feature_ordinals.each_pair do |name, states|
         value = self.send(name)

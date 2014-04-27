@@ -12,7 +12,7 @@ class Post < ActiveRecord::Base
       vk_id: lambda { |x| Math.log x }
   }
   self.feature_ordinals = {
-      attachment_type: [nil, "graffiti", "audio", "link", "video", "poll", "doc", "photo", "note", "album"]
+      attachment_type: [0, "graffiti", "audio", "link", "video", "poll", "doc", "photo", "note", "album"]
   }
 
 
