@@ -1,43 +1,47 @@
 <div class="post-header">
-  <%= image_tag current_user.avatar%>
-  <h3><%= link_to current_user.first_name + " " + current_user.last_name, current_user.url%></h3>
-  <%= link_to "Выйти", destroy_user_session_path, :method => :delete%>
-  <%= link_to 'Сбросить лайки', post_like_path(id: 0), method: :delete, data: { confirm: 'Точно?' }, :remote => true %>
+  <%= image_tag current_user.avatar %>
+  <h3><%= link_to current_user.first_name + " " + current_user.last_name, current_user.url %></h3>
+  <%= link_to "Выйти", destroy_user_session_path, :method => :delete %>
+  <%= link_to 'Сбросить лайки', post_like_path(id: 0), method: :delete, data: {confirm: 'Точно?'}, :remote => true %>
 </div>
 
 <% @posts.each do |post| %>
     <div class="panel panel-info post">
       <div class="panel-heading">
-	<button type="button" class="btn btn-default like-button <%="active" if post.like == 1%>" data-toggle="button" data-post-id="<%= post.id%>">Like</button>
+        <button type="button" class="btn btn-default like-button <%= "active" if post.like == 1 %>" data-toggle="button" data-post-id="<%= post.id %>">Like</button>
         &nbsp<%= link_to "Ссылка на пост", post.vk_url %>
       </div>
       <div class="panel-body">
-        <table class="post-data">
-          <th align="center">Likes</th>
-          <th>Likes age</th>
-          <th>Likes share</th>
-          <th>Open profiles share</th>
-          <th>Reposts</th>
-          <th>Attachment type</th>
-          <th>Text length</th>
-          <th>Comments</th>
-          <th>Log id</th>
-          <tr>
-            <td><%= post.likes_count %></td>
-            <td><%= post.likes_age %></td>
-            <td><%= post.likes_share.round(2) %></td>
-            <td><%= post.closed_profiles_share.round(2) %></td>
-            <td><%= post.reposts_count %></td>
-            <td><%= post.attachment_type %></td>
-            <td><%= post.text.length %></td>
-            <td><%= post.comments_count %></td>
-            <td><%= Math.log(post.owner_id).round(0) %></td>
-          </tr>
-        </table>
+        <% if admin? %>
+            <table class="post-data">
+              <th align="center">Likes</th>
+              <th>Likes age</th>
+              <th>Likes share</th>
+              <th>Open profiles share</th>
+              <th>Reposts</th>
+              <th>Attachment type</th>
+              <th>Text length</th>
+              <th>Comments</th>
+              <th>Log id</th>
+              <tr>
+                <td><%= post.likes_count %></td>
+                <td><%= post.likes_age %></td>
+                <td><%= post.likes_share.round(2) %></td>
+                <td><%= post.closed_profiles_share.round(2) %></td>
+                <td><%= post.reposts_count %></td>
+                <td><%= post.attachment_type %></td>
+                <td><%= post.text.length %></td>
+                <td><%= post.comments_count %></td>
+                <td><%= Math.log(post.owner_id).round(0) %></td>
+              </tr>
+            </table>
+        <% end %>
         <br/>
+
         <p> <%= post.text.html_safe %></p>
         <% unless post.attachment_text.nil? %>
             <br/>
+
             <p>  <%= post.text.html_safe %> </p>
         <% end %>
         <% unless post.attachment_image.nil? %>

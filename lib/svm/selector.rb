@@ -5,8 +5,8 @@ module SVM
 
     MAX_TRAINING = 100
     POSTS_PER_PAGE = 10
-    SAMPLE_SIZE = 1000
-    MAX_SAMPLE_SIZE = 4000
+    SAMPLE_SIZE = 10000
+    MAX_SAMPLE_SIZE = 10000
 
     def self.select(user)
       labels, posts = self.get_training_sample(user)
