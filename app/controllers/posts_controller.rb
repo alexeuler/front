@@ -17,8 +17,7 @@ class PostsController < ApplicationController
       post = OpenStruct.new(x.attributes)
       post.vk_url = x.vk_url
       post.attachment_vk_url = x.attachment_vk_url
-      #ToDo - overwrites likes, needs fixing
-      post.like = liked_posts[post.id]
+      post.like = liked_posts[x.id]
       if post.like.nil?
         current_user.like_post(post.id, 0)
         post.like = 0
