@@ -12,7 +12,7 @@ class PostsController < ApplicationController
     redirect_to root_path unless user_signed_in?
     post_models = current_user.get_top_posts(POSTS_PER_PAGE)
     ids = post_models.map(&:id)
-    liked_posts = current_user.get_post_likes(ids)
+    liked_posts = current_user.get_posts_likes(ids)
     @posts = post_models.map do |x|
       post = OpenStruct.new(x.attributes)
       post.vk_url = x.vk_url
