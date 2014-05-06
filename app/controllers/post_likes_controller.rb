@@ -1,15 +1,13 @@
 class PostLikesController < ApplicationController
   def update
-    user_id = current_user.id
     post_id = params[:post_id].to_i
-    @post_like = PostLike.where(user_id: user_id, post_id: post_id).first_or_initialize
-    @post_like.value = params[:value].to_i
-    @post_like.save
+    like_value = params[:value].to_i
+    current_user.like_post(post_id, like_value)
     render json: {status:"Ok"}
   end
 
   def destroy
-    PostLike.destroy_all(user_id: current_user.id)
+    current_user.clear_likes
     render json: {status:"Ok"}
   end
 end

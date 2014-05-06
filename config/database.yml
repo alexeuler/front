@@ -3,9 +3,9 @@
 # Install the pg driver:
 #   gem install pg
 # On OS X with Homebrew:
-#   gem install pg -- --with-pg-config=/usr/local/bin/pg_config
+#   gem install pg -- --with-pg-config=/usr/local/bin/CRAWLER_DB_config
 # On OS X with MacPorts:
-#   gem install pg -- --with-pg-config=/opt/local/lib/postgresql84/bin/pg_config
+#   gem install pg -- --with-pg-config=/opt/local/lib/postgresql84/bin/CRAWLER_DB_config
 # On Windows:
 #   gem install pg
 #       Choose the win32 build.
@@ -17,20 +17,20 @@
 development:
   adapter: postgresql
   encoding: unicode
-  database: <%=ENV["PG_NAME"]%>
+  database: <%=ENV["CRAWLER_DB_NAME"]%>
   pool: 5
   host: localhost
-  username: <%=ENV["PG_USER"]%>
-  password: <%=ENV["PG_PASS"]%>
+  username: <%=ENV["CRAWLER_DB_USER"]%>
+  password: <%=ENV["CRAWLER_DB_PASS"]%>
 
 performance:
   adapter: postgresql
   encoding: unicode
-  database: <%=ENV["PG_NAME"]%>
+  database: <%=ENV["CRAWLER_DB_NAME"]%>
   pool: 5
   host: localhost
-  username: <%=ENV["PG_USER"]%>
-  password: <%=ENV["PG_PASS"]%>
+  username: <%=ENV["CRAWLER_DB_USER"]%>
+  password: <%=ENV["CRAWLER_DB_PASS"]%>
 
 
   # Connect on a TCP socket. Omitted by default since the client uses a
@@ -60,14 +60,14 @@ test:
   database: front_test
   pool: 5
   host: localhost
-  username: <%=ENV["PG_USER"]%>
-  password: <%=ENV["PG_PASS"]%>
+  username: <%=ENV["CRAWLER_DB_USER"]%>
+  password: <%=ENV["CRAWLER_DB_PASS"]%>
 
 production:
   adapter: postgresql
   encoding: unicode
-  database: crawler
+  database: <%=ENV["CRAWLER_DB_NAME"]%>
   host: localhost
   pool: 5
-  username: <%=ENV["PG_USER"]%>
-  password: <%=ENV["PG_PASS"]%>
+  username: <%=ENV["CRAWLER_DB_USER"]%>
+  password: <%=ENV["CRAWLER_DB_PASS"]%>
