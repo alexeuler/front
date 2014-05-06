@@ -126,6 +126,7 @@ GEM
     rb-libsvm (1.1.5)
     rdoc (4.1.1)
       json (~> 1.4)
+    redis (3.0.7)
     rspec-collection_matchers (0.0.4)
       rspec-expectations (>= 2.99.0.beta1)
     rspec-core (3.0.0.beta2)
@@ -199,6 +200,7 @@ DEPENDENCIES
   rails (= 4.0.0)
   rails-perftest
   rb-libsvm
+  redis
   rspec-rails (~> 3.0.0.beta)
   ruby-prof
   rvm-capistrano

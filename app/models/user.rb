@@ -13,4 +13,8 @@ class User < ActiveRecord::Base
     "http://vk.com/id#{uid}"
   end
 
+  def get_top_posts(count)
+
+  end
+
 end
