@@ -20,6 +20,17 @@ class User < ActiveRecord::Base
     $redis.zadd(key, score, member)
   end
 
+  def get_posts_likes(post_ids)
+    key = "likes:#{self.id}"
+    @likes||=$redis.zrange(key, 0, -1)
+    result = {}
+    @likes.each do |like|
+      id, value = like.split[":"]
+      result[id] = value if post_ids.include?(id.to_i)
+    end
+    result
+  end
+
   def clear_likes
     key = "likes:#{self.id}"
     $redis.zremrangebyrank(key, 0, -1)
