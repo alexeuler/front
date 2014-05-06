@@ -14,26 +14,18 @@ class User < ActiveRecord::Base
   end
 
   def like_post(post_id, like_value)
-    member = "#{post_id}:#{like_value}"
-    score = Time.now.to_i
     key = "likes:#{self.id}"
-    $redis.zadd(key, score, member)
+    $redis.hset(key, post_id, like_value)
   end
 
   def get_posts_likes(post_ids)
     key = "likes:#{self.id}"
-    @likes||=$redis.zrange(key, 0, -1)
-    result = {}
-    @likes.each do |like|
-      id, value = like.split[":"]
-      result[id] = value if post_ids.include?(id.to_i)
-    end
-    result
+    $redis.hmget(key, post_ids)
   end
 
   def clear_likes
     key = "likes:#{self.id}"
-    $redis.zremrangebyrank(key, 0, -1)
+    $redis.del(key)
   end
 
   def get_top_posts(count)
@@ -43,7 +35,7 @@ class User < ActiveRecord::Base
     delta = count - posts.count
     min, max = Post.minimum(:id), Post.maximum(:id) if delta > 0
     while delta > 0
-      random_ids = delta.times do |i|
+      random_ids = (1..delta).map do |i|
         (min + (max - min) * rand()).round(0)
       end
       posts += Post.where(id: random_ids).to_a
