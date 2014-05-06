@@ -1,5 +1,5 @@
 require 'ostruct'
-require 'svm/selector'
+
 class PostsController < ApplicationController
   #before_action :set_post, only: [:show, :edit, :update, :destroy]
 
@@ -7,13 +7,14 @@ class PostsController < ApplicationController
   # GET /posts.json
   def index
     redirect_to root_path unless user_signed_in?
-    @posts = SVM::Selector.select(current_user).map do |x|
-      post = OpenStruct.new(x.attributes)
-      post.vk_url = x.vk_url
-      post.attachment_vk_url = x.attachment_vk_url
-      post.like = x.post_like.nil? ? 0 : x.post_like.value
-      post
-    end
+    @posts = []
+    # @posts = SVM::Selector.select(current_user).map do |x|
+    #   post = OpenStruct.new(x.attributes)
+    #   post.vk_url = x.vk_url
+    #   post.attachment_vk_url = x.attachment_vk_url
+    #   post.like = x.post_like.nil? ? 0 : x.post_like.value
+    #   post
+    # end
   end
 
 =begin
