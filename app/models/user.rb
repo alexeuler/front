@@ -30,7 +30,7 @@ class User < ActiveRecord::Base
 
   def get_top_posts(count)
     ids = $redis.lrange("posts:best:#{self.id}", 0, count - 1).map(&:to_i)
-    $redis.ltrim("posts:best:#{self.id}", 0, count - 1)
+    $redis.ltrim("posts:best:#{self.id}", count, -1)
     posts = Post.where(id: ids).to_a
     delta = count - posts.count
     min, max = Post.minimum(:id), Post.maximum(:id) if delta > 0
