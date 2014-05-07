@@ -24,8 +24,8 @@ class User < ActiveRecord::Base
   end
 
   def clear_likes
-    key = "likes:#{self.id}"
-    $redis.del(key)
+    $redis.del("likes:#{self.id}")
+    $redis.del("posts:best:#{self.id}")
   end
 
   def get_top_posts(count)
