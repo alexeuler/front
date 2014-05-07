@@ -33,9 +33,8 @@ class PostsController < ApplicationController
   def update_training_model
     connection= Rails.application.config.selector
     socket = TCPSocket.new(connection[:host], connection[:port])
-    request = <<-eos
-      GET /?user_id=#{current_user.id} HTTP/1.1
-    eos
+    request = "GET /?user_id=#{current_user.id} HTTP/1.1\r\n"
+    request << "\r\n"
     socket.write request
     socket.close
   end
