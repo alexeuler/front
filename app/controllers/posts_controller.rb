@@ -1,4 +1,5 @@
 require 'ostruct'
+require 'socket'
 
 class PostsController < ApplicationController
 
@@ -24,6 +25,19 @@ class PostsController < ApplicationController
       end
       post
     end
+    update_training_model
+  end
+
+  private
+
+  def update_training_model
+    connection= Rails.application.config.selector
+    socket = TCPSocket.new(connection[:host], connection[:port])
+    request = <<-eos
+      GET /?user_id=#{current_user.id} HTTP/1.1
+    eos
+    socket.write request
+    socket.close
   end
 
 =begin
