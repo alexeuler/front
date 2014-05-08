@@ -10,7 +10,7 @@ class PostsController < ApplicationController
   # GET /posts
   # GET /posts.json
   def index
-    redirect_to root_path unless user_signed_in?
+    redirect_to users_path unless user_signed_in?
     post_models = current_user.get_top_posts(POSTS_PER_PAGE)
     ids = post_models.map(&:id)
     liked_posts = current_user.get_posts_likes(ids)
@@ -33,7 +33,7 @@ class PostsController < ApplicationController
   def update_training_model
     connection= Rails.application.config.selector
     socket = TCPSocket.new(connection[:host], connection[:port])
-    request = "GET /?user_id=#{current_user.id} HTTP/1.1\r\n"
+    request = "GET /train?user_id=#{current_user.id} HTTP/1.1\r\n"
     request << "\r\n"
     socket.write request
     socket.close
