@@ -32,11 +32,14 @@ class PostsController < ApplicationController
 
   def update_training_model
     connection= Rails.application.config.selector
-    socket = TCPSocket.new(connection[:host], connection[:port])
-    request = "GET /train?user_id=#{current_user.id} HTTP/1.1\r\n"
-    request << "\r\n"
-    socket.write request
-    socket.close
+    begin
+      socket = TCPSocket.new(connection[:host], connection[:port])
+      request = "GET /train?user_id=#{current_user.id} HTTP/1.1\r\n"
+      request << "\r\n"
+      socket.write request
+    rescue
+      socket.close if socket
+    end
   end
 
 =begin
@@ -96,13 +99,13 @@ class PostsController < ApplicationController
 =end
 
   private
-    # Use callbacks to share common setup or constraints between actions.
-    def set_post
-      @post = Post.find(params[:id])
-    end
+  # Use callbacks to share common setup or constraints between actions.
+  def set_post
+    @post = Post.find(params[:id])
+  end
 
-    # Never trust parameters from the scary internet, only allow the white list through.
-    def post_params
-      params[:post]
-    end
+  # Never trust parameters from the scary internet, only allow the white list through.
+  def post_params
+    params[:post]
+  end
 end
