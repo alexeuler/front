@@ -4,6 +4,9 @@ class User < ActiveRecord::Base
   devise :database_authenticatable, :registerable,
          :recoverable, :rememberable, :trackable, :validatable, :omniauthable
 
+  MAX_LIKES = 500
+  TRIM_THRESHOLD = 100
+
   has_many :post_likes
   has_many :posts, :through => :post_likes
 
@@ -15,13 +18,18 @@ class User < ActiveRecord::Base
 
   def like_post(post_id, like_value)
     key = "likes:#{self.id}"
-    $redis.hset(key, post_id, like_value)
+    $redis.hset(key, post_id, "#{like_value}:#{Time.now.to_i}")
+    count = $redis.hlen(key)
+    trim_likes if count > MAX_LIKES + TRIM_THRESHOLD
   end
 
   def get_posts_likes(post_ids)
     key = "likes:#{self.id}"
-    $redis.hmget(key, post_ids)
+    likes = $redis.hmget(key, post_ids)
+    likes.each_with_index { |value, index| likes[index] = value.split(":")[0] if value }
+    likes
   end
+
 
   def clear_likes
     $redis.del("likes:#{self.id}")
@@ -32,7 +40,7 @@ class User < ActiveRecord::Base
     ids = $redis.lrange("posts:best:#{self.id}", 0, count - 1).map(&:to_i)
     $redis.ltrim("posts:best:#{self.id}", count, -1)
     posts = Post.where(id: ids).to_a
-    posts.sort_by! {|a| ids.index(a.id)}
+    posts.sort_by! { |a| ids.index(a.id) }
     delta = count - posts.count
     min, max = Post.minimum(:id), Post.maximum(:id) if delta > 0
     while delta > 0
@@ -44,5 +52,19 @@ class User < ActiveRecord::Base
     end
     posts
   end
+
+  private
+
+  def trim_likes
+    key ="likes:#{self.id}"
+    hash = $redis.hgetall(key)
+    ary = hash.to_a
+    ary.sort_by! { |a| -a[1].split(":")[1].to_i }
+    ary = ary[0..MAX_LIKES - 1]
+    ary.flatten!
+    $redis.del(key)
+    $redis.hmset(key,ary)
+  end
+
 
 end
