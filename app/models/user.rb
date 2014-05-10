@@ -32,6 +32,7 @@ class User < ActiveRecord::Base
     ids = $redis.lrange("posts:best:#{self.id}", 0, count - 1).map(&:to_i)
     $redis.ltrim("posts:best:#{self.id}", count, -1)
     posts = Post.where(id: ids).to_a
+    posts.sort_by! {|a| ids.index(a.id)}
     delta = count - posts.count
     min, max = Post.minimum(:id), Post.maximum(:id) if delta > 0
     while delta > 0
