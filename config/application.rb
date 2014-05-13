@@ -13,16 +13,6 @@ Bundler.require(:default, Rails.env)
 
 module Front
   class Application < Rails::Application
-    initializer "redis" do |app|
-      unless ENV['RAILS_GROUPS']=="assets"
-        puts "$$$$$$$$$$$$$$$$$$$$$$$$$$$4"
-        require 'redis'
-        params = {:host => ENV["FRONT_DB_HOST"], :port => ENV["FRONT_DB_PORT"],
-                  :db => ENV["FRONT_DB_NAME"]}
-        $redis = Redis.new(params)
-        $redis.auth(ENV["FRONT_DB_PASS"])
-      end
-    end
     # Settings in config/environments/* take precedence over those specified here.
     # Application configuration should go into files in config/initializers
     # -- all .rb files in that directory are automatically loaded.
