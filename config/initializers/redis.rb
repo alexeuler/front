@@ -4,4 +4,4 @@ params = {:host => ENV["FRONT_DB_HOST"], :port => ENV["FRONT_DB_PORT"],
 $redis = Redis.new(params)
 puts params
 puts $redis.nil?
-$redis.auth(ENV["FRONT_DB_PASS"])
+#$redis.auth(ENV["FRONT_DB_PASS"])
