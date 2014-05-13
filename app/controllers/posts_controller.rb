@@ -37,7 +37,8 @@ class PostsController < ApplicationController
       request = "GET /train?user_id=#{current_user.id} HTTP/1.1\r\n"
       request << "\r\n"
       socket.write request
-    rescue
+    rescue Exception=>e
+      puts "Unable to connect to selector. Message: #{e.message}"
       socket.close if socket
     end
   end
