@@ -5,6 +5,6 @@ begin
 $redis = Redis.new(params)
 $redis.auth(ENV["FRONT_DB_PASS"])
 rescue Exception=>e
-  puts "Unables to connect to Redis: #{e.message}"
+  puts "Unable to connect to Redis: #{e.message}"
 end
 
