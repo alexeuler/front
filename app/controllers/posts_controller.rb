@@ -10,7 +10,10 @@ class PostsController < ApplicationController
   # GET /posts
   # GET /posts.json
   def index
-    redirect_to users_path unless user_signed_in?
+    unless user_signed_in?
+      redirect_to users_path
+      return
+    end
     post_models = current_user.get_top_posts(POSTS_PER_PAGE)
     ids = post_models.map(&:id)
     liked_posts = current_user.get_posts_likes(ids)
