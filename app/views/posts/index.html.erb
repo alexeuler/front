@@ -1,8 +1,12 @@
 <div class="post-header">
+  <div class="post-header-cell">
   <%= image_tag current_user.avatar %>
+  </div>
+    <div class="post-header-cell">
   <h3><%= link_to current_user.first_name + " " + current_user.last_name, current_user.url %></h3>
-  <%= link_to "Выйти", destroy_user_session_path, :method => :delete %>
-  <%= link_to 'Сбросить лайки', post_like_path(id: 0), method: :delete, data: {confirm: 'Точно?'}, :remote => true %>
+    <%= link_to "Выйти", destroy_user_session_path, :method => :delete %>
+    <%= link_to 'Сбросить лайки', post_like_path(id: 0), method: :delete, data: {confirm: 'Точно?'}, :remote => true %>
+    </div>
 </div>
 
 <% @posts.each do |post| %>
