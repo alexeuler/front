@@ -16,6 +16,13 @@
     </div>
 
   </div>
+
+  <div class="post-header-cell" style = "float: right">
+  <form action="<%=posts_path %>">
+    <input type="submit" value="Следующие посты" class="btn btn-success">
+  </form>
+</div>
+
 </div>
 
 <% @posts.each do |post| %>
