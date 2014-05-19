@@ -29,7 +29,7 @@
     <div class="panel panel-info post">
       <div class="panel-heading">
         <button type="button" class="btn btn-default like-button <%= "active" if post.like == 1 %>" data-toggle="button" data-post-id="<%= post.id %>">Like</button>
-        &nbsp<%= link_to "Ссылка на пост", post.vk_url %>
+        &nbsp<%= link_to "Оригинал", post.vk_url %>
       </div>
       <div class="panel-body">
         <% if admin? %>
