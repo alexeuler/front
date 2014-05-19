@@ -4,6 +4,7 @@ require 'socket'
 class PostsController < ApplicationController
 
   POSTS_PER_PAGE = 10
+  COMPLETE_TRAINING_POSTS = 50
 
   #before_action :set_post, only: [:show, :edit, :update, :destroy]
 
@@ -17,6 +18,7 @@ class PostsController < ApplicationController
     post_models = current_user.get_top_posts(POSTS_PER_PAGE)
     ids = post_models.map(&:id)
     liked_posts = current_user.get_posts_likes(ids)
+    @progress = (current_user.get_positive_likes_count.to_f * 100 / COMPLETE_TRAINING_POSTS).to_i
     @posts = post_models.map do |x|
       post = OpenStruct.new(x.attributes)
       post.vk_url = x.vk_url

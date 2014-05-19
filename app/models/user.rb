@@ -30,6 +30,13 @@ class User < ActiveRecord::Base
     likes
   end
 
+  def get_positive_likes_count
+    key = "likes:#{self.id}"
+    values = $redis.hvals(key)
+    likes = values.map {|x| x.split(":")[0]}
+    likes.count("1")
+  end
+
 
   def clear_likes
     $redis.del("likes:#{self.id}")

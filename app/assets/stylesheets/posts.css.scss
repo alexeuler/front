@@ -4,21 +4,26 @@
 
 .post-header {
   padding: 10px;
-  background-color: rgba(255,255,255,0.3);
+  background-color: rgba(255,255,255,1);
   @include bordered;
   position: fixed;
   width: 100%;
   .post-header-cell {
+    padding: 0px 10px;
     display: inline-block;
-    vertical-align: bottom;
+    vertical-align: middle;
     h3 {
       margin: 0;
+    }
+    .progress {
+      margin: 10px 0px;
     }
   }
 }
 
 .post {
-  margin: 30px auto;
+  margin: 90px auto 10px auto;
+  padding: 0px;
   width: 70%;
   background-color: rgba(255,255,255,0.3);
   @include bordered;
